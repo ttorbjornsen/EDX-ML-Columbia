@@ -19,12 +19,12 @@ d = X.shape[0]
 
 identityMatrix = np.identity(d)
 temp = inputLambda*identityMatrix
-X_T = pd.DataFrame.transpose(X)
+X_T = X.transpose()
 
-firstTerm = (pd.DataFrame.dot(X,X_T) + inputLambda*identityMatrix)
-print firstTerm
-firstTermInverse = pd.DataFrame(np.linalg.pinv(firstTerm.values), firstTerm.columns, firstTerm.index)
-print firstTermInverse
+firstTerm = (X.dot(X_T) + inputLambda*identityMatrix)
+result = np.linalg.inv(firstTerm).dot(X_T.dot(y))
+
+# result.to_csv(targetFileAbsPath, sep=';',)
 
 
 
