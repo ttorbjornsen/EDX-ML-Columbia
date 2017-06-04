@@ -18,7 +18,7 @@ rrTargetFileRelPath = 'wRR_' + str(inputLambda) + '.csv'
 rrTargetFileAbsPath = os.path.join(scriptDir, rrTargetFileRelPath)
 
 alTargetFileRelPath = 'active_' + str(inputLambda) + '_' + str(inputSigma) + '.csv'
-altargetFileAbsPath = os.path.join(scriptDir, rrTargetFileRelPath)
+alTargetFileAbsPath = os.path.join(scriptDir, alTargetFileRelPath)
 
 scriptDir = os.path.dirname(__file__) #<-- absolute dir the script is in
 xTrainPath = os.path.join(scriptDir, sys.argv[3])
@@ -40,12 +40,9 @@ dfRidgeRegression.to_csv(rrTargetFileAbsPath, sep=';', header=None, index=False)
 
 # PART 2 - Active learning
 XTest = pd.read_csv(xTestPath, header=None)
-covarianceSigmaMatrix = np.linalg.inv(inputLambda * identityMatrix + ((X_T.dot(X))/inputSigma))
 
 
-
-indexTraversalIndex = []
-for i in range(1,10): #find the 10 highest variances
+def getHighestVariance(indexTraversalList, XTest):
     highestVariance = -1
     tempIndex = -1
     for xTestRow in range(0, XTest.shape[0]):
@@ -57,9 +54,20 @@ for i in range(1,10): #find the 10 highest variances
             highestVariance = sigma0
             tempIndex = xTestRow + 1
 
-    indexTraversalIndex.append(tempIndex)
+    return tempIndex
 
-print indexTraversalIndex
+
+indexTraversalIndex = []
+for i in range(0,10): #find the 10 highest variances
+    identityMatrix = np.identity(d)
+    X_T = X.transpose()
+    covarianceSigmaMatrix = np.linalg.inv(inputLambda * identityMatrix + ((X_T.dot(X))/inputSigma))
+    highestVarianceIndex = getHighestVariance(indexTraversalIndex, XTest)
+    indexTraversalIndex.append(highestVarianceIndex)
+    X = X.append(XTest.iloc[[highestVarianceIndex-1]])
+
+dfActiveLearning = pd.DataFrame(indexTraversalIndex)
+dfActiveLearning.to_csv(alTargetFileAbsPath, sep=';', header=None, index=False)
 
 
 
