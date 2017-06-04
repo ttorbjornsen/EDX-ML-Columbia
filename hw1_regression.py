@@ -20,11 +20,15 @@ d = X.shape[0]
 identityMatrix = np.identity(d)
 temp = inputLambda*identityMatrix
 X_T = X.transpose()
+print X
+print X_T
+
 
 firstTerm = (X.dot(X_T) + inputLambda*identityMatrix)
-result = np.linalg.inv(firstTerm).dot(X_T.dot(y))
 
-# result.to_csv(targetFileAbsPath, sep=';',)
+leastsquares = (np.linalg.inv(X_T.dot(X))).dot(X_T).dot(y)
+print np.linalg.lstsq(X,y)
+print leastsquares
 
 
 
